@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 
-CHROME_DRIVER_PATH = "C:\Development\chromedriver.exe"
+CHROME_DRIVER_PATH = "YOUR CHROME DRIVER'S PATH"
 PROMISED_UP = 40
 PROMISED_DOWN = 20
 TWITTER_EMAIL = "YOUR TWITTER EMAIL"
@@ -30,6 +30,8 @@ class InternetSpeedTwitterBot:
         self.down_speed = float(self.driver.find_element(by=By.CLASS_NAME, value="upload-speed").text)
         print(self.up_speed)
         print(self.down_speed)
+        if self.up_speed < PROMISED_UP or self.down_speed < PROMISED_DOWN:
+            self.tweet_at_provider()
 
     def tweet_at_provider(self):
         self.driver.get(TWITTER_LOGIN_URL)
@@ -45,7 +47,19 @@ class InternetSpeedTwitterBot:
         pass_input.send_keys(Keys.ENTER)
         time.sleep(20)
 
+        tweet_input = self.driver.find_element(by=By.CLASS_NAME, value="public-DraftStyleDefault-block")
+        my_tweet = f"My internet down speed {self.down_speed}, up speed {self.up_speed} what a slow net"
+        tweet_input.send_keys(my_tweet)
+
+        time.sleep(5)
+        tweet_button = self.driver.find_element(by=By.XPATH, value='//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div[2]/div[3]/div/span/span')
+        tweet_button.click()
+
+        time.sleep(30)
+
+        self.driver.quit()
+
 
 bot = InternetSpeedTwitterBot()
 bot.get_internet_speed()
-bot.tweet_at_provider()
+
