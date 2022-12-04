@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 import time
 
 CHROME_DRIVER_PATH = "YOUR CHROME DRIVER'S PATH"
@@ -9,12 +10,14 @@ PROMISED_UP = 20
 PROMISED_DOWN = 40
 TWITTER_EMAIL = "YOUR TWITTER EMAIL"
 TWITTER_PASS = "YOUR TWITTER PASSWORD"
+USERNAME = "YOUR TWITTER ID USERNAME"
 NET_SPEEED_URL = "https://www.speedtest.net/"
 TWITTER_LOGIN_URL = "https://twitter.com/i/flow/login"
 
 
 class InternetSpeedTwitterBot:
     """Class to represent internet speed Twitter bot."""
+
     def __init__(self) -> None:
         """Creates a new instance of service and chrome driver."""
         self.service = Service(executable_path=CHROME_DRIVER_PATH)
@@ -54,12 +57,19 @@ class InternetSpeedTwitterBot:
         time.sleep(5)
         email_input.send_keys(Keys.ENTER)
         time.sleep(5)
-        pass_input = self.driver.find_element(by=By.NAME,
-                                              value="password")
-        pass_input.send_keys(TWITTER_PASS)
-        time.sleep(5)
-        pass_input.send_keys(Keys.ENTER)
-        time.sleep(20)
+        try:
+            pass_input = self.driver.find_element(by=By.NAME, value="password")
+        except NoSuchElementException:
+            username_input = self.driver.find_element(by=By.NAME, value='text')
+            username_input.send_keys(USERNAME)
+            username_input.send_keys(Keys.ENTER)
+            time.sleep(3)
+        finally:
+            pass_input = self.driver.find_element(by=By.NAME, value="password")
+            pass_input.send_keys(TWITTER_PASS)
+            time.sleep(5)
+            pass_input.send_keys(Keys.ENTER)
+            time.sleep(10)
 
         tweet_input = self.driver.find_element(by=By.CLASS_NAME,
                                                value="public-DraftStyleDefault-block")
@@ -68,9 +78,7 @@ class InternetSpeedTwitterBot:
 
         time.sleep(5)
         tweet_button = self.driver.find_element(by=By.XPATH,
-                                                value='//*[@id="react-root"]/div/div/div[2]/main/div/div/div/'
-                                                      'div[1]/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[3]/'
-                                                      'div/div/div[2]/div[3]/div/span/span')
+                                                value='/html/body/div[1]/div/div/div[2]/main/div/div/div/div/div/div[3]/div/div[2]/div[1]/div/div/div/div[2]/div[3]/div/div/div[2]/div[3]/div/span/span')
         tweet_button.click()
 
         time.sleep(30)
